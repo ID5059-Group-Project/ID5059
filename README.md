@@ -6,3 +6,8 @@ https://universityofstandrews907-my.sharepoint.com/:w:/g/personal/man9_st-andrew
 ## Weekly Meeting:  
 https://universityofstandrews907-my.sharepoint.com/:w:/g/personal/man9_st-andrews_ac_uk/ERyRDOopwKZJhM85lQGpu_ABfFZQYm33Xlss5aKTBX0rNw?e=285heT
 
+## Kaggle (for cross evaluation):
+https://www.kaggle.com/code/raconwizard/fork-of-cross-evaluation-here
+
+
+
