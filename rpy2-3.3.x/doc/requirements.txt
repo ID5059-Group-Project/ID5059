@@ -1,0 +1,9 @@
+ipython
+jupyterlab
+multipledispatch
+nbconvert
+notedown
+numpy
+pandas
+rpy2
+sphinx

@@ -1,0 +1,66 @@
+name: Upload Python Package
+
+on:
+  release:
+    types: [created]
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+    tags:
+      - RELEASE_3_*_*
+
+jobs:
+  deploy:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        r-version: [3.6]
+        os: [ubuntu-latest, macOS-latest, windows-2019]
+        exclude:
+        - python-version: 3.8
+          os: windows-2019 
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Set up R ${{ matrix.r-version }}
+      uses: r-lib/actions/setup-r@master
+      with:
+        r-version: ${{ matrix.r-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install setuptools wheel twine
+    - name: Build
+      run: |
+        python setup.py bdist_wheel
+    - id: getfilename
+      run: |
+        echo "::set-output name=file::$(basename -a $(ls dist))"
+    - name: Create package for master on POSIX
+      uses: actions/upload-artifact@v1
+      if: (github.event_name == 'pull_request' || github.event_name == 'push') && matrix.r-version == '3.6' && (!startsWith(matrix.os, 'windows'))
+      with:
+          name: ${{ steps.getfilename.outputs.file }}
+          path: dist/${{ steps.getfilename.outputs.file }}
+    - name: Create package for master on Windows
+      uses: actions/upload-artifact@v1
+      if: (github.event_name == 'pull_request' || github.event_name == 'push') && matrix.r-version == '3.6' && startsWith(matrix.os, 'windows')
+      with:
+          name: rpy2-3.3.0.dev0-py3-none-any.whl
+          path: ${{ steps.getfilename.outputs.file }}  
+    - name: Publish
+      if: github.event_name == 'release'
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        echo 'Uploading to pypi'
+        echo $(ls dist/*)
+        # twine upload dist/*
